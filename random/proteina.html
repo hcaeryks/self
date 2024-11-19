@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking Suplements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
+    <style>
+        /* General Styles */
+        body {
+            background-color: #121212; /* Dark background */
+            color: #ffffff; /* Light text */
+            font-family: 'Inter', sans-serif; /* Use Inter font */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container for the table with margin */
+        .table-container {
+            margin: 20px; /* Adds margin to all sides (top, bottom, left, right) */
+            padding: 20px; /* Optional padding to keep table away from edges */
+            background-color: #1e1e1e; /* Optional: Add background color to container */
+            border-radius: 10px; /* Optional: Adds rounded corners to the container */
+        }
+
+        /* Table Styling */
+        table.dataTable {
+            color: #ffffff; /* Table text color */
+            background-color: #1e1e1e; /* Table background color */
+        }
+
+        table.dataTable thead {
+            background-color: #333333; /* Header background */
+        }
+
+        table.dataTable tbody tr {
+            background-color: #1e1e1e; /* Row background */
+        }
+
+        table.dataTable tbody tr:nth-child(odd) {
+            background-color: #2a2a2a; /* Alternate row background */
+        }
+
+        table.dataTable th, table.dataTable td {
+            border-color: #444444; /* Border color */
+        }
+
+        /* Link Styling */
+        a {
+            color: #bb86fc; /* Accent color */
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        caption {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #ffffff; /* Adjust title color */
+        }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <table id="example" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Marca</th>
+                    <th>Preço</th>
+                    <th>Quantidade</th>
+                    <th>Porção</th>
+                    <th>Proteína</th>
+                    <th>Doses</th>
+                    <th>Proteína por real</th>
+                    <th>Preço por dose</th>
+                    <th>Proteína total</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Marca</th>
+                    <th>Preço</th>
+                    <th>Quantidade</th>
+                    <th>Porção</th>
+                    <th>Proteína</th>
+                    <th>Doses</th>
+                    <th>Proteína por real</th>
+                    <th>Preço por dose</th>
+                    <th>Proteína total</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+    <script>
+
+
+        $(document).ready(function() {
+            fetch('protein-out.csv') // Replace with your CSV file path
+                .then(response => response.text())
+                .then(csvData => {
+                    // Use PapaParse to parse the CSV
+                    Papa.parse(csvData, {
+                        header: true, // If the CSV has headers
+                        skipEmptyLines: true, // Skip empty lines
+                        complete: function(results) {
+                            const data = results.data;
+
+                            // Populate DataTables
+                            const table = $('#example').DataTable({
+                                data: data,
+                                columns: Object.keys(data[0]).map(key => ({ title: key, data: key })),
+                                paging: false,
+                                language: {
+                                    url: 'datatables-pt-BR.json',
+                                },
+                                columnDefs: [
+                                    {
+                                        targets: [1, 2, 3, 4, 5, 6, 7, 8], // Apply to multiple columns
+                                        render: function(data, type, row) {
+                                            if (type === 'sort') {
+                                                // Remove non-numeric characters and replace commas with periods for sorting
+                                                return parseFloat(data.replace(',', '.').replace(/[^\d.-]/g, ''));
+                                            }
+                                            // For display, return the original data (with "g" suffix and commas)
+                                            return data;
+                                        },
+                                        type: 'num' // Ensures these columns are sorted numerically
+                                    }
+                                ],
+                                order: [[6, 'desc']]
+                            });
+                        }
+                    });
+                });
+        });
+
+    </script>
+</body>
+</html></html>
